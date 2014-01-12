@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#--------------------------------------------------------------------------------
+# proxy-toggle: OS X shell script to toggle web proxying through an ssh host,
+#               for secure browsing that appears to come from elsewhere.
+# 
+# Requires a remote host with ssh access.
+# Set your ssh host/user below, and run this script to toggle web proxy on/off.
+#
+# To avoid password prompts, generate a public key and add it to the remote
+# ~/.ssh/authorized_keys
+#
+# Makes use of SSH's SOCKS tunneling capabilities:
+# http://www.linuxjournal.com/content/use-ssh-create-http-proxy
+#
+# Daniel Jones <http://www.erase.net/>
+#--------------------------------------------------------------------------------
+
+SSH_USER=sf
+SSH_HOST=xylem
+
+PROXY_PORT=9999
+
+#--------------------------------------------------------------------------------
+# If en0 has an IP, assume we're using a wired network connection and assign a
+# proxy accordingly. Otherwise, default to proxying the wifi interface.
+#--------------------------------------------------------------------------------
+if `ifconfig en0 | grep -q inet`; then
+	INTERFACE=Ethernet
+else
+	INTERFACE=Wi-Fi
+fi
+
+PID=`pidof "ssh -Nf"`
+
+#--------------------------------------------------------------------------------
+# Check whether proxy process is running.
+# If yes, kill it and disable SOCKS proxy in network config.
+# If no, start it up, configure and enable network SOCKS proxy.
+#--------------------------------------------------------------------------------
+if [ "$PID" != "" ]
+then
+	echo "stopping proxy (pid $PID)"
+	kill $PID
+	sudo networksetup -setsocksfirewallproxystate $INTERFACE off
+else
+	echo "starting proxy"
+	ssh -Nf -D $PROXY_PORT $SSH_USER@$SSH_HOST
+	sudo networksetup -setsocksfirewallproxy $INTERFACE localhost $PROXY_PORT
+fi
+
