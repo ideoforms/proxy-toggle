@@ -16,8 +16,8 @@
 # Daniel Jones <http://www.erase.net/>
 #--------------------------------------------------------------------------------
 
-SSH_USER=map01dj
-SSH_HOST=igor.gold.ac.uk
+SSH_USER=sf
+SSH_HOST=xylem
 
 PROXY_PORT=9999
 
@@ -26,9 +26,13 @@ PROXY_PORT=9999
 # proxy accordingly. Otherwise, default to proxying the wifi interface.
 #--------------------------------------------------------------------------------
 if `ifconfig en0 | grep -q inet`; then
-	INTERFACE=Ethernet
+	#--------------------------------------------------------------------------------
+	# Extract friendly names for network interfaces from networksetup
+	# (usually "Ethernet" and "Wi-Fi" but can differ)
+	#--------------------------------------------------------------------------------
+	INTERFACE=`networksetup -listnetworkserviceorder  | grep en0 -B1 | awk '{print $2}' | head -1`
 else
-	INTERFACE=Wi-Fi
+	INTERFACE=`networksetup -listnetworkserviceorder  | grep en1 -B1 | awk '{print $2}' | head -1`
 fi
 
 PID=`ps auxw | grep "ssh -Nf"| grep -v grep | awk '{print $2}'`
