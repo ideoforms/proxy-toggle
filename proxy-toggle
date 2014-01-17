@@ -16,8 +16,8 @@
 # Daniel Jones <http://www.erase.net/>
 #--------------------------------------------------------------------------------
 
-SSH_USER=sf
-SSH_HOST=xylem
+SSH_USER=map01dj
+SSH_HOST=igor.gold.ac.uk
 
 PROXY_PORT=9999
 
@@ -31,7 +31,7 @@ else
 	INTERFACE=Wi-Fi
 fi
 
-PID=`pidof "ssh -Nf"`
+PID=`ps auxw | grep "ssh -Nf"| grep -v grep | awk '{print $2}'`
 
 #--------------------------------------------------------------------------------
 # Check whether proxy process is running.
