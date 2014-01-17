@@ -49,7 +49,7 @@ then
 	sudo networksetup -setsocksfirewallproxystate $INTERFACE off
 else
 	echo "starting proxy"
-	ssh -Nf -D $PROXY_PORT $SSH_USER@$SSH_HOST
+	ssh -Nf -D $PROXY_PORT $SSH_USER@$SSH_HOST 2>/dev/null
 	sudo networksetup -setsocksfirewallproxy $INTERFACE localhost $PROXY_PORT
 fi
 
