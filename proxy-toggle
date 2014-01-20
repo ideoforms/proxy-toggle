@@ -44,12 +44,19 @@ PID=`ps auxw | grep "ssh -Nf"| grep -v grep | awk '{print $2}'`
 #--------------------------------------------------------------------------------
 if [ "$PID" != "" ]
 then
-	echo "stopping proxy (pid $PID)"
+	echo "Stopping proxy (PID $PID)"
 	kill $PID
 	sudo networksetup -setsocksfirewallproxystate $INTERFACE off
 else
-	echo "starting proxy"
+	echo "Starting proxy"
 	ssh -Nf -D $PROXY_PORT $SSH_USER@$SSH_HOST 2>/dev/null
 	sudo networksetup -setsocksfirewallproxy $INTERFACE localhost $PROXY_PORT
+	PID=`ps auxw | grep "ssh -Nf"| grep -v grep | awk '{print $2}'`
+	if [ "$PID" != "" ]
+	then
+		echo "Proxy started OK (PID $PID)"
+	else
+		echo "Failed to start proxy"
+	fi
 fi
 
